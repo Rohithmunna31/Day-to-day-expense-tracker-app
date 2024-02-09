@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User signup page</title>
+    <link rel="shortcut icon" href="#" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
   </head>
   <body>
     <form>
@@ -18,7 +20,7 @@
 
       <button type="submit" id="Signup">Signup</button>
     </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+
     <script>
       const btn = document.getElementById("Signup");
 
@@ -30,7 +32,7 @@
         const password = document.getElementById("password").value;
 
         axios
-          .post("http://localhost:3000/user/signup", {
+          .post("/user/signup", {
             username: username,
             email: email,
             password: password,
