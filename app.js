@@ -22,14 +22,27 @@ app.post("/user/signup", (req, res) => {
 
   const { username, email, password } = req.body;
 
-  const newData = Data.create({
-    username: username,
-    email: email,
-    password: password,
-  });
-  res.send(req.body);
+  const find = Data.findAll({
+    where:{
+      email:email
+    }
+  })
+
+  if(find){
+    alert('This email already exits');
+  }else{
+    const newData = Data.create({
+      username: username,
+      email: email,
+      password: password,
+    });
+    res.send(req.body);
+  }
 });
 
+app.post('/user/login',(req,res)=>{
+
+})
 sequelize
   .sync()
   .then((res) => {
@@ -39,4 +52,4 @@ sequelize
     console.log(err);
   });
 
-app.listen(3001);
+app.listen(3000);

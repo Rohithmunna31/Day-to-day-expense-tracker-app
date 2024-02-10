@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../util/database");
+const sequelize = require("../utill/database");
 
 const Data = sequelize.define("data", {
   id: {
@@ -10,7 +10,8 @@ const Data = sequelize.define("data", {
     primaryKey: true,
   },
   username: {
-    type:Sequelize.STRING,},
+    type: Sequelize.STRING,
+  },
   email: {
     type: Sequelize.DOUBLE,
     allowNull: false,
@@ -20,6 +21,5 @@ const Data = sequelize.define("data", {
     allowNull: false,
   },
 });
-
 
 module.exports = Data;
