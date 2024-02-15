@@ -13,7 +13,7 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
 app.use(cors());
-app.get("/user", (req, res) => {
+app.get("/user/signup", (req, res) => {
   res.sendFile(path.join(__dirname, "./public/signup.html"));
 });
 
@@ -23,14 +23,14 @@ app.post("/user/signup", (req, res) => {
   const { username, email, password } = req.body;
 
   const find = Data.findAll({
-    where:{
-      email:email
-    }
-  })
+    where: {
+      email: email,
+    },
+  });
 
-  if(find){
-    alert('This email already exits');
-  }else{
+  if (find) {
+    alert("This email already exitst try login");
+  } else {
     const newData = Data.create({
       username: username,
       email: email,
@@ -40,9 +40,21 @@ app.post("/user/signup", (req, res) => {
   }
 });
 
-app.post('/user/login',(req,res)=>{
+app.post("/user/login", (req, res) => {
+  console.log(req);
 
-})
+  const { email, password } = req.body;
+
+  const newData = Data.findAll({ where: { email: email } });
+
+  if (newData) {
+    alert("this email already exsits");
+  } else {
+    res.redirect("/user/app/:id");
+  }
+
+  res.send(req.body);
+});
 sequelize
   .sync()
   .then((res) => {
@@ -51,5 +63,9 @@ sequelize
   .catch((err) => {
     console.log(err);
   });
+
+app.get("/user/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "./public/login.html"));
+});
 
 app.listen(3000);

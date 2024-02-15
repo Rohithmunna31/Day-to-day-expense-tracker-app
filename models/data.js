@@ -13,11 +13,11 @@ const Data = sequelize.define("data", {
     type: Sequelize.STRING,
   },
   email: {
-    type: Sequelize.DOUBLE,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   password: {
-    type: Sequelize.password,
+    type: Sequelize.TEXT,
     allowNull: false,
   },
 });

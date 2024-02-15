@@ -21,6 +21,8 @@
       <button type="submit" id="Signup">Signup</button>
     </form>
 
+    <button id="gotologin">Already have an account LOGIN</button>
+
     <script>
       const btn = document.getElementById("Signup");
 
@@ -43,6 +45,12 @@
           .catch((err) => {
             console.log(err);
           });
+      });
+
+      const login = document.getElementById("gotologin");
+
+      login.addEventListener("click", (e) => {
+        window.location.href = "/user/login";
       });
     </script>
   </body>

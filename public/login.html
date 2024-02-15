@@ -26,22 +26,23 @@
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
-        axios.post("http:localhost/user/login", {
-          email: email,
-          password: password,
-        })
-        .then(res=>{
+        axios
+          .post("/user/login", {
+            email: email,
+            password: password,
+          })
+          .then((res) => {
             console.log(res);
-        })
-        .catch(err=>{
+          })
+          .catch((err) => {
             console.log(err);
-        })
+          });
       });
 
       const newusersignup = document.getElementById("newusersignup");
 
       newusersignup.addEventListener("click", (e) => {
-        window.location.href = "http:/localhost/user";
+        window.location.href = "/user/signup";
       });
     </script>
   </body>
