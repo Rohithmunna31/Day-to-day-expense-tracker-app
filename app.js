@@ -62,6 +62,8 @@ app.post("/user/login", async (req, res) => {
       }
       if (res == true) {
         console.log("logged in successfully");
+      }else{
+        console.log("passwords didnt match");
       }
     });
   } else {
