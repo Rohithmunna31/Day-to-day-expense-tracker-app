@@ -5,7 +5,7 @@ const sequelize = require("../utill/database");
 const Data = sequelize.define("data", {
   id: {
     type: Sequelize.INTEGER,
-    autoIncreament: true,
+    autoIncrement: true,
     allowNull: false,
     primaryKey: true,
   },
@@ -17,7 +17,7 @@ const Data = sequelize.define("data", {
     allowNull: false,
   },
   password: {
-    type: Sequelize.TEXT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
 });
