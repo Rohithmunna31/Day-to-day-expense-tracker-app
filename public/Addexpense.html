@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Expense</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  </head>
+  <body>
+    <form id="form">
+      <label for="addexpense"> Choose ExpenseAmount </label>
+      <input type="text" id="addexpense" />
+
+      <label for="description"> Choose description </label>
+      <input type="text" id="description" />
+
+      <label for="category"> Choose category </label>
+      <select name="category" id="category">
+        <option value="Food">Food</option>
+        <option value="Fuel">Fuel</option>
+        <option value="Emi">Emi</option>
+      </select>
+
+      <button type="submit" id="submit">Add Expense</button>
+    </form>
+    <div id="expenses-list"></div>
+    <script>
+      const btn = document.getElementById("submit");
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const expense = document.getElementById("addexpense").value;
+        const description = document.getElementById("description").value;
+        const category = document.getElementById("category").value;
+        axios
+          .post("/expense/addexpense", {
+            expense: expense,
+            description: description,
+            category: category,
+          })
+          .then((res) => {
+            console.log(res);
+            const { id } = res.data;
+
+            const expenseList = document.getElementById("expenses-list");
+            const show = document.createElement("div");
+
+            show.setAttribute("id", `data-${id}`);
+
+            show.innerHTML = `<p> ${expense} <p/>
+                              <p> ${description} <p/>
+                              <p> ${category} <p/>
+                              <button onclick="deleteExpense(${id})">Delete</button>
+                                <hr> `;
+
+            console.log(show.getAttribute("id"));
+            expenseList.appendChild(show);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
+      window.addEventListener("load", async (e) => {
+        try {
+          const response = await axios.get("/expense/getexpenses");
+          const expenses = response.data;
+
+          const expensesList = document.getElementById("expenses-list");
+
+          expensesList.innerHTML = ""; // Clear previous data
+
+          expenses.forEach((expense) => {
+            const expenseItem = document.createElement("div");
+            expenseItem.setAttribute("id", `data-${expense.id}`);
+            expenseItem.innerHTML = ` 
+            <p>${expense.expense}</p>
+            <p>${expense.description}</p>
+            <p>${expense.category}</p>
+            <button onclick="deleteExpense(${expense.id})">Delete</button>
+            <hr>
+          `;
+            // console.log(expenseItem);
+            console.log(expenseItem.getAttribute("id"));
+            expensesList.appendChild(expenseItem);
+          });
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      });
+
+      // Function to delete an expense
+      async function deleteExpense(expenseId) {
+        try {
+          const expenseElement = document.querySelector(
+            `#expenses-list [id=data-${expenseId}]`
+          );
+          // console.log(expenseElement);
+          if (expenseElement) {
+            expenseElement.remove();
+          }
+          await axios.delete(`/expense/delete/${expenseId}`);
+        } catch (error) {
+          console.error("Error deleting expense:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
