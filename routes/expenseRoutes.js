@@ -6,16 +6,26 @@ const expenseController = require("../controllers/expenseController");
 
 const router = express.Router();
 
+const userAuthenication = require("../utill/authenication");
+
 // expense/addexpense => GET
 router.get("/addexpense", expenseController.getAddexpense);
 
 // expense/addexpense => POST
-router.post("/addexpense", expenseController.postAddexpense);
+router.post(
+  "/addexpense",
+  userAuthenication.authenication,
+  expenseController.postAddexpense
+);
 
 // expense/getexpenses => GET
-router.get("/getexpenses", expenseController.getExpenses);
+router.get(
+  "/getexpenses",
+  userAuthenication.authenication,
+  expenseController.getExpenses
+);
 
 // expense/delete/:id => DELETE
-router.delete("/delete/:id", expenseController.deleteExpense);
+router.delete("/delete/:id",userAuthenication.authenication ,expenseController.deleteExpense);
 
 module.exports = router;

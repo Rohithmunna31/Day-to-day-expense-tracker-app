@@ -1,8 +1,10 @@
-const Data = require("../models/data");
+const Data = require("../models/User");
 
 const path = require("path");
 
 const bcrypt = require("bcrypt");
+
+const jwt = require("jsonwebtoken");
 
 exports.getUsersignup = (req, res) => {
   res.sendFile(path.join(__dirname, "../public/signup.html"));
@@ -56,7 +58,10 @@ exports.postUserlogin = async (req, res) => {
       }
       if (data === true) {
         console.log("password matched successfully");
-        res.status(200).send("password is correct");
+        res.status(200).json({
+          message: "password matched succesfully",
+          token: generateAccessToken(newData.dataValues.id),
+        });
         // return res.sendFile(path.join(__dirname, "../public/Addexpense.html"));
       } else {
         console.log("Wrong password");
@@ -67,5 +72,8 @@ exports.postUserlogin = async (req, res) => {
     console.log("email not found ");
     // res.status(400).send("email not found");
   }
-  res.send("hell0");
 };
+
+function generateAccessToken(id) {
+  return jwt.sign({ userId: id }, "secretkey");
+}

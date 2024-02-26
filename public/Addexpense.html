@@ -33,12 +33,19 @@
         const expense = document.getElementById("addexpense").value;
         const description = document.getElementById("description").value;
         const category = document.getElementById("category").value;
+        const token = localStorage.getItem("token");
         axios
-          .post("/expense/addexpense", {
-            expense: expense,
-            description: description,
-            category: category,
-          })
+          .post(
+            "/expense/addexpense",
+            {
+              expense: expense,
+              description: description,
+              category: category,
+            },
+            {
+              headers: { Authorization: token },
+            }
+          )
           .then((res) => {
             console.log(res);
             const { id } = res.data;
@@ -51,7 +58,7 @@
             show.innerHTML = `<p> ${expense} <p/>
                               <p> ${description} <p/>
                               <p> ${category} <p/>
-                              <button onclick="deleteExpense(${id})">Delete</button>
+                              <button onclick="deleteExpense(${id})">Delete Expense</button>
                                 <hr> `;
 
             console.log(show.getAttribute("id"));
@@ -64,7 +71,12 @@
 
       window.addEventListener("load", async (e) => {
         try {
-          const response = await axios.get("/expense/getexpenses");
+          const token = localStorage.getItem("token");
+          const response = await axios.get("/expense/getexpenses", {
+            headers: { Authorization: token },
+          });
+
+          console.log(response);
           const expenses = response.data;
 
           const expensesList = document.getElementById("expenses-list");
@@ -78,7 +90,7 @@
             <p>${expense.expense}</p>
             <p>${expense.description}</p>
             <p>${expense.category}</p>
-            <button onclick="deleteExpense(${expense.id})">Delete</button>
+            <button onclick="deleteExpense(${expense.id})">Delete Expense </button>
             <hr>
           `;
             // console.log(expenseItem);
@@ -100,7 +112,10 @@
           if (expenseElement) {
             expenseElement.remove();
           }
-          await axios.delete(`/expense/delete/${expenseId}`);
+          const token = localStorage.getItem("token");
+          await axios.delete(`/expense/delete/${expenseId}`, {
+            headers: { Authorization: token },
+          });
         } catch (error) {
           console.error("Error deleting expense:", error);
         }

@@ -7,6 +7,8 @@ const sequelize = require("./utill/database");
 const { log } = require("console");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const User = require("./models/User");
+const Expense = require("./models/expenses");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyparser.urlencoded({ extended: false }));
@@ -20,6 +22,9 @@ app.use("/user", userRoutes);
 
 app.use("/expense", expenseRoutes);
 
+User.hasMany(Expense);
+Expense.belongsTo(User);
+
 sequelize
   .sync()
   .then((res) => {
@@ -27,7 +32,7 @@ sequelize
     console.log("Database connected");
   })
   .catch((err) => {
-    // console.log(err);
+    console.log(err);
     console.log("Database connection failed");
   });
 
