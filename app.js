@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const User = require("./models/User");
 const Expense = require("./models/expenses");
+const Orders = require("./models/order");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyparser.urlencoded({ extended: false }));
@@ -22,8 +23,13 @@ app.use("/user", userRoutes);
 
 app.use("/expense", expenseRoutes);
 
+app.user("purchase");
+
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Orders);
+Orders.belongsTo(User);
 
 sequelize
   .sync()

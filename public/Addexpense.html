@@ -23,6 +23,9 @@
 
       <button type="submit" id="submit">Add Expense</button>
     </form>
+
+    <button id="premium">Buy Premimum</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <div id="expenses-list"></div>
     <script>
       const btn = document.getElementById("submit");
@@ -86,7 +89,7 @@
           expenses.forEach((expense) => {
             const expenseItem = document.createElement("div");
             expenseItem.setAttribute("id", `data-${expense.id}`);
-            expenseItem.innerHTML = ` 
+            expenseItem.innerHTML = `
             <p>${expense.expense}</p>
             <p>${expense.description}</p>
             <p>${expense.category}</p>
@@ -120,6 +123,46 @@
           console.error("Error deleting expense:", error);
         }
       }
+
+      document
+        .getElementById("premium")
+        .addEventListener("click", async (e) => {
+          const token = localStorage.getItem("token");
+
+          const response = await axios.get(
+            "http:localhost:3000/purchase/buypremiummembershi",
+            { heders: { Authorization: token } }
+          );
+          console.log(response);
+
+          let options = {
+            key: response.data.key_id,
+            order_id: response.data.order.id,
+            // This function will handle the success of payment
+            handler: async function (response) {
+              await axios.post(
+                "http://localhost:3000/purchase/updatetransactionstatus",
+                {
+                  order_id: options.order_id,
+                  payment_id: options.payment_id,
+                },
+                {
+                  headers: { Authorization: token },
+                }
+              );
+
+              alert("You are premium member now ");
+            },
+          };
+          const rzp1 = new Razorpay(options);
+          rzp1.open();
+          e.preventDefault();
+
+          rzp1.on("payment.failed", function (response) {
+            console.log(response);
+            alert("something went wrong");
+          });
+        });
     </script>
   </body>
 </html>
