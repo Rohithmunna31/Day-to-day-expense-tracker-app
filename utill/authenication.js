@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 exports.authenication = (req, res, next) => {
   const token = req.header("Authorization");
 
+  console.log(token + "here at token");
   const user = jwt.verify(token, "secretkey");
   console.log(user);
   User.findByPk(user.userId)
@@ -17,4 +18,3 @@ exports.authenication = (req, res, next) => {
       console.log("User authenication failed");
     });
 };
-

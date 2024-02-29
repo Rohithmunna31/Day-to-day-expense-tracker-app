@@ -48,32 +48,38 @@ exports.postUserlogin = async (req, res) => {
 
   const newData = await Data.findOne({ where: { email: email } });
 
-  console.log(newData.dataValues);
+  // console.log(newData.dataValues);
 
   if (newData) {
     bcrypt.compare(password, newData.dataValues.password, (err, data) => {
       if (err) {
         console.log("err occrued didnt compare");
-        // res.status(400).send("err occured didnt compare password");
+        res.send("err occured didnt compare password");
       }
       if (data === true) {
         console.log("password matched successfully");
         res.status(200).json({
           message: "password matched succesfully",
-          token: generateAccessToken(newData.dataValues.id),
+          token: generateAccessToken(
+            newData.dataValues.id,
+            newData.dataValues.username,
+            newData.dataValues.ispremiumuser
+          ),
         });
-        // return res.sendFile(path.join(__dirname, "../public/Addexpense.html"));
       } else {
         console.log("Wrong password");
-        // res.status(400).send("wrong password");
+        res.status(401).send("wrong password");
       }
     });
   } else {
     console.log("email not found ");
-    // res.status(400).send("email not found");
+    res.status(404).send("email not found");
   }
 };
 
-function generateAccessToken(id) {
-  return jwt.sign({ userId: id }, "secretkey");
+function generateAccessToken(id, name, ispremiumuser) {
+  return jwt.sign(
+    { userId: id, name: name, ispremiumuser: ispremiumuser },
+    "secretkey"
+  );
 }

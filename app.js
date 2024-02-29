@@ -7,9 +7,11 @@ const sequelize = require("./utill/database");
 const { log } = require("console");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const purchaseRoutes = require("./routes/purchase");
 const User = require("./models/User");
 const Expense = require("./models/expenses");
 const Orders = require("./models/order");
+const premiumRoutes = require("./routes/premiumroutes");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyparser.urlencoded({ extended: false }));
@@ -23,7 +25,9 @@ app.use("/user", userRoutes);
 
 app.use("/expense", expenseRoutes);
 
-app.user("purchase");
+app.use("/purchase", purchaseRoutes);
+
+app.use("/premium", premiumRoutes);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -41,5 +45,4 @@ sequelize
     console.log(err);
     console.log("Database connection failed");
   });
-
 app.listen(3000);

@@ -21,7 +21,7 @@ exports.postAddexpense = (req, res) => {
       expense: expense,
       description: description,
       category: category,
-      userId: req.user.id,
+      UserId: req.user.id,
     })
     .then((data) => {
       console.log("expense created");
