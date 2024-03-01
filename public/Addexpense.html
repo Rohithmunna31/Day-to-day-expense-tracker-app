@@ -158,7 +158,7 @@
               order_id: response.data.order.id,
               // This function will handle the success of payment
               handler: async function (response) {
-                await axios.post(
+                const res = await axios.post(
                   "/purchase/updatetransactionstatus",
                   {
                     order_id: options.order_id,
@@ -170,7 +170,7 @@
                 );
 
                 alert("You are premium member now ");
-
+                // localStorage.setItem("token", res.data.token);
                 showpremiummessage();
               },
             };
@@ -231,7 +231,7 @@
 
           leaderboardelements.innerHTML += "<h1> Leaderboard <h1/>";
           leaderboardArray.data.forEach((userDetails) => {
-            leaderboardelements.innerHTML += ` <li> Name - ${userDetails.username} Total expense -${userDetails.total_cost} </li>`;
+            leaderboardelements.innerHTML += ` <li> Name - ${userDetails.username} , Total expense -${userDetails.total_cost} </li>`;
           });
         });
     </script>

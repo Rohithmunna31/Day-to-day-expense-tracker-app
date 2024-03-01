@@ -4,6 +4,8 @@ const Order = require("../models/order");
 
 const User = require("../models/User");
 
+const userController = require('./userController');
+
 require("dotenv").config();
 
 exports.purchasepremium = async (req, res) => {
@@ -15,32 +17,27 @@ exports.purchasepremium = async (req, res) => {
     });
     const amount = 2500;
     console.log(amount);
-    rzp.orders
-      .create({ amount, currency: "INR" }, async (err, order) => {
+
+    const order = await new Promise((resolve, reject) => {
+      rzp.orders.create({ amount, currency: "INR" }, (err, order) => {
         if (err) {
-          console.log("orders . create ? ");
+          console.log("orders.create error");
           console.log(err);
-          // throw new Error(JSON.stringify(err));
+          reject(err);
+        } else {
+          resolve(order);
         }
-        await Order.create({
-          orderid: order.id,
-          status: "PENDING",
-          UserId: req.user.id,
-        })
-          .then(() => {
-            console.log("in createOrder");
-            return res.status(201).json({ order, key_id: rzp.key_id });
-          })
-          .catch((err) => {
-            throw new Error(err);
-          });
-      })
-      .then(() => {
-        console.log("rzpordrratd");
-      })
-      .catch((err) => {
-        console.log(err);
       });
+    });
+
+    await Order.create({
+      orderid: order.id,
+      status: "PENDING",
+      UserId: req.user.id,
+    });
+
+    console.log("in createOrder");
+    return res.status(201).json({ order, key_id: rzp.key_id });
   } catch (err) {
     console.log(err);
     res.status(403).json({ message: "something went wrong", error: err });
@@ -68,5 +65,5 @@ exports.updatetransactionstatus = async (req, res) => {
 
   await User.update({ ispremiumuser: true }, { where: { id: userid } });
 
-  res.status(202).json({ success: true, message: "transaction successfull" });
+  res.status(202).json({ success: true, message: "transaction successfull",});
 };

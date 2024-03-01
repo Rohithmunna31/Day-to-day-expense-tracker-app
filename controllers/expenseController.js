@@ -4,64 +4,92 @@ const User = require("../models/User");
 
 const path = require("path");
 
-const bcrypt = require("bcrypt");
+const sequelize = require("../utill/database");
+
 const { log } = require("console");
 
 exports.getAddexpense = (req, res) => {
   res.sendFile(path.join(__dirname, "../public/Addexpense.html"));
 };
 
-exports.postAddexpense = (req, res) => {
+exports.postAddexpense = async (req, res) => {
+  const t = await sequelize.transaction();
   const { expense, description, category } = req.body;
-  // console.log(req.body);
-  console.log(req.user.id);
-  console.log("iam here in postaddexpense");
-  let values;
 
-  const createExpense = expenses
-    .create({
-      expense: expense,
-      description: description,
-      category: category,
-      UserId: req.user.id,
-    })
-    .then((data) => {
-      console.log("expense created");
-      console.log(req.user.total_cost);
-      values = data.dataValues;
-      const total_expense = Number(req.user.total_cost) + Number(expense);
-      console.log(total_expense);
-      User.update(
-        {
-          total_cost: total_expense,
-        },
-        {
-          where: { id: req.user.id },
-        }
-      );
-      res.send(values);
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log("error occured in creating expense");
-      res.send("an error occurder cannot create expense");
-    });
+  if (expense == undefined || expense.length == 0) {
+    return res
+      .status(400)
+      .json({ success: false, message: "paramenters missing " });
+  }
+  let values;
+  try {
+    const data = await expenses.create(
+      {
+        expense: expense,
+        description: description,
+        category: category,
+        UserId: req.user.id,
+      },
+      {
+        transaction: t,
+      }
+    );
+    values = data.dataValues;
+    const total_expense = Number(req.user.total_cost) + Number(expense);
+    console.log(total_expense);
+    await User.update(
+      {
+        total_cost: total_expense,
+      },
+      {
+        where: { id: req.user.id },
+        transaction: t,
+      }
+    );
+    await t.commit();
+    res.status(200).send(values);
+  } catch (err) {
+    console.log(err);
+    await t.rollback();
+    return res.send("an error occurder cannot create expense");
+  }
 };
 
 exports.getExpenses = async (req, res) => {
-  // console.log(req.user.id);
   const allExpenses = await expenses.findAll({
     where: { userId: req.user.id },
   });
-  console.log(allExpenses);
   res.status(200).send(allExpenses);
 };
 
-exports.deleteExpense = (req, res) => {
-  console.log(req.params);
+exports.deleteExpense = async (req, res) => {
+  const sequelize = require("../utill/database");
+  const t = await sequelize.transaction();
   const { id } = req.params;
-  console.log(req.user.id);
-  console.log(id);
-  const count = expenses.destroy({ where: { id: id, userId: req.user.id } });
-  res.send("deleted successfully");
+
+  try {
+    const total_cost = req.user.total_cost;
+    console.log(id);
+    const expensetodelete = await expenses.findOne({ where: { id } });
+    const updatedtotal_cost = total_cost - expensetodelete.dataValues.expense;
+
+    await User.update(
+      { total_cost: updatedtotal_cost },
+      {
+        where: {
+          id: req.user.id,
+        },
+        transaction: t,
+      }
+    );
+    await expenses.destroy({
+      where: { id: id, userId: req.user.id },
+      transaction: t,
+    });
+    t.commit();
+    res.status(200).send("deleted successfully");
+  } catch (err) {
+    t.rollback();
+    res.status(500).send("an error occured cannot delete expense");
+  }
 };
