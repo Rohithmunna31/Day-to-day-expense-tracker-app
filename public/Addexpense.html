@@ -101,7 +101,7 @@
 
           const expensesList = document.getElementById("expenses-list");
 
-          expensesList.innerHTML = ""; // Clear previous data
+          expensesList.innerHTML = "<h1> Expense List </h1>"; // Clear previous data
 
           expenses.forEach((expense) => {
             const expenseItem = document.createElement("div");
@@ -223,9 +223,12 @@
           });
 
           console.log(leaderboardArray);
-          var leaderboardelements = document.getElementById(
+          let leaderboardelements = document.getElementById(
             "leaderboardelements"
           );
+
+          leaderboardelements.innerHTML = "";
+
           leaderboardelements.innerHTML += "<h1> Leaderboard <h1/>";
           leaderboardArray.data.forEach((userDetails) => {
             leaderboardelements.innerHTML += ` <li> Name - ${userDetails.username} Total expense -${userDetails.total_cost} </li>`;

@@ -1,5 +1,7 @@
 const expenses = require("../models/expenses");
 
+const User = require("../models/User");
+
 const path = require("path");
 
 const bcrypt = require("bcrypt");
@@ -25,8 +27,18 @@ exports.postAddexpense = (req, res) => {
     })
     .then((data) => {
       console.log("expense created");
+      console.log(req.user.total_cost);
       values = data.dataValues;
-      console.log(values);
+      const total_expense = Number(req.user.total_cost) + Number(expense);
+      console.log(total_expense);
+      User.update(
+        {
+          total_cost: total_expense,
+        },
+        {
+          where: { id: req.user.id },
+        }
+      );
       res.send(values);
     })
     .catch((err) => {
