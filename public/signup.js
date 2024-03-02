@@ -15,8 +15,15 @@ const btn = document.getElementById("Signup");
           })
           .then((res) => {
             console.log(res);
+            window.location.href = "/user/login";
           })
           .catch((err) => {
             console.log(err);
           });
+      });
+
+      const login = document.getElementById("gotologin");
+
+      login.addEventListener("click", (e) => {
+        window.location.href = "/user/login";
       });

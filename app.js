@@ -11,7 +11,9 @@ const purchaseRoutes = require("./routes/purchase");
 const User = require("./models/User");
 const Expense = require("./models/expenses");
 const Orders = require("./models/order");
+const forgotpassword = require("./models/forgotpasswordrequest");
 const premiumRoutes = require("./routes/premiumroutes");
+const passwordRoutes = require("./routes/passwordRoutes");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyparser.urlencoded({ extended: false }));
@@ -29,11 +31,16 @@ app.use("/purchase", purchaseRoutes);
 
 app.use("/premium", premiumRoutes);
 
+app.use("/password", passwordRoutes);
+
 User.hasMany(Expense);
 Expense.belongsTo(User);
 
 User.hasMany(Orders);
 Orders.belongsTo(User);
+
+User.hasMany(forgotpassword);
+forgotpassword.belongsTo(User);
 
 sequelize
   .sync()
