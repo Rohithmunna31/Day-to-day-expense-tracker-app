@@ -35,6 +35,7 @@ exports.postAddexpense = async (req, res) => {
       }
     );
     values = data.dataValues;
+    console.log(values);
     const total_expense = Number(req.user.total_cost) + Number(expense);
     console.log(total_expense);
     await User.update(
@@ -90,6 +91,7 @@ exports.deleteExpense = async (req, res) => {
     res.status(200).send("deleted successfully");
   } catch (err) {
     t.rollback();
+    console.log(err);
     res.status(500).send("an error occured cannot delete expense");
   }
 };

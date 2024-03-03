@@ -4,9 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Expense</title>
+    <!-- <style>
+      table,
+      th,
+      td {
+        border: 1px solid;
+      }
+      td {
+        width: 200px;
+      }
+    </style> -->
+    <link rel="stylesheet" href="/Addexpense.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
   </head>
   <body>
+    <p id="datenow"></p>
     <form id="form">
       <label for="addexpense"> Choose ExpenseAmount </label>
       <input type="text" id="addexpense" />
@@ -19,17 +31,21 @@
         <option value="Food">Food</option>
         <option value="Fuel">Fuel</option>
         <option value="Emi">Emi</option>
+        <option value="salary">Salary</option>
+        <option value="rent">Rent</option>
       </select>
 
       <button type="submit" id="submit">Add Expense</button>
     </form>
 
     <div id="youarepremium"></div>
-    <button id="leaderboard"></button>
-    <div id="leaderboardelements"></div>
+    <button style="visibility: hidden" id="leaderboard"></button>
     <button id="premium">Buy Premimum</button>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <div id="expenses-list"></div>
+
+    <div id="leaderboardelements"></div>
+    <button onclick="download()" id="downloadexpense">Download File</button>
     <script src="/Addexpense.js"></script>
   </body>
 </html>
