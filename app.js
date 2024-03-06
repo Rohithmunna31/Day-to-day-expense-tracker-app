@@ -12,6 +12,7 @@ const User = require("./models/User");
 const Expense = require("./models/expenses");
 const Orders = require("./models/order");
 const forgotpassword = require("./models/forgotpasswordrequest");
+const savedFiles = require("./models/savedfiles");
 const premiumRoutes = require("./routes/premiumroutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 
@@ -42,11 +43,15 @@ Orders.belongsTo(User);
 User.hasMany(forgotpassword);
 forgotpassword.belongsTo(User);
 
+User.hasMany(savedFiles);
+savedFiles.belongsTo(User);
+
 sequelize
   .sync()
   .then((res) => {
     // console.log(res);
     console.log("Database connected");
+    console.log(process.env.AWS_BUCKET_NAME);
   })
   .catch((err) => {
     console.log(err);

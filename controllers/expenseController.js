@@ -1,4 +1,8 @@
+const AWS = require("aws-sdk");
+const S3 = require("aws-sdk/clients/s3");
 const expenses = require("../models/expenses");
+
+const savedFiles = require("../models/savedfiles");
 
 const User = require("../models/User");
 
@@ -95,3 +99,58 @@ exports.deleteExpense = async (req, res) => {
     res.status(500).send("an error occured cannot delete expense");
   }
 };
+
+exports.downloadexpense = async (req, res) => {
+  try {
+    const expense = await expenses.findAll({ where: { UserId: req.user.id } });
+
+    console.log(expense);
+
+    const stringifiedexpense = JSON.stringify(expense);
+
+    const userid = req.user.id;
+
+    const filename = `Expenses${userid}/${new Date()}.txt`;
+
+    const fileUrl = await uploadtos3(stringifiedexpense, filename);
+
+    await savedFiles.create({ fileUrl: fileUrl, UserId: req.user.id });
+
+    res.status(201).json({ fileUrl, status: "success", err: null });
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ fileUrl: null, success: "failed", err });
+  }
+};
+
+function uploadtos3(data, filename) {
+  const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+  const USER_KEY = process.env.AWS_IAM_USER_KEY;
+  const USER_SECRET = process.env.AWS_IAM_USER_SECRET;
+  console.log(BUCKET_NAME);
+
+  let s3 = new AWS.S3({
+    accessKeyId: USER_KEY,
+    secretAccessKey: USER_SECRET,
+  });
+
+  return new Promise((resolve, reject) => {
+    s3.upload(
+      {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: filename,
+        Body: data,
+        ACL: "public-read",
+      },
+      {},
+      (err, response) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          resolve(response.Location);
+        }
+      }
+    );
+  });
+}

@@ -25,6 +25,8 @@ router.get(
   expenseController.getExpenses
 );
 
+router.get('/download',userAuthenication.authenication,expenseController.downloadexpense);
+
 // expense/delete/:id => DELETE
 router.delete("/delete/:id",userAuthenication.authenication ,expenseController.deleteExpense);
 

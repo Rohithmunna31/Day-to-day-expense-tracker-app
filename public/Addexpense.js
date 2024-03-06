@@ -5,8 +5,6 @@ const d = new Date().toLocaleString("en-us", {
   dateStyle: "full",
 });
 
-
-
 btn.addEventListener("click", (e) => {
   e.preventDefault();
 
@@ -14,6 +12,7 @@ btn.addEventListener("click", (e) => {
   const description = document.getElementById("description").value;
   const category = document.getElementById("category").value;
   const token = localStorage.getItem("token");
+
   axios
     .post(
       "/expense/addexpense",
@@ -375,21 +374,24 @@ function premiumusersexpenses(expenses) {
 }
 
 function download() {
+  const token = localStorage.getItem("token");
+
+  console.log("Hello front end");
   axios
-    .get("http://localhost:3000/user/download", {
+    .get("/expense/download", {
       headers: { Authorization: token },
     })
     .then((response) => {
-      if (response.status === 201) {
-        var a = document.createElement("a");
-        a.href = response.data.fileUrl;
-        a.download = "myexpense.csv";
-        a.click();
-      } else {
-        throw new Error(response.data.message);
-      }
+      var a = document.createElement("a");
+      console.log(response);
+      console.log(response.data);
+      a.href = response.data.fileUrl;
+      a.download = "myexpense.csv";
+      a.click();
+      console.log("success");
+      return;
     })
     .catch((err) => {
-      showError(err);
+      console.log(err);
     });
 }
