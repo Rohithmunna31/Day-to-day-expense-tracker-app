@@ -61,10 +61,42 @@ exports.postAddexpense = async (req, res) => {
 };
 
 exports.getExpenses = async (req, res) => {
-  const allExpenses = await expenses.findAll({
-    where: { userId: req.user.id },
-  });
-  res.status(200).send(allExpenses);
+  try {
+    const page = parseInt(req.query.page) || 1; // Extract page number from query parameter, default to page 1 if not provided
+    const limit = 10; // Number of expenses per page
+
+    const offset = (page - 1) * limit;
+
+    const totalExpenses = await expenses.count({
+      where: { userId: req.user.id },
+    });
+
+    const totalPages = Math.ceil(totalExpenses / limit);
+    const nextPage = page + 1;
+    const previosPage = page - 1;
+
+    const hasNextpage = nextPage <= totalPages ? true : false;
+    const hasPreviospage = page > 1 ? true : false;
+
+    const allExpenses = await expenses.findAll({
+      where: { userId: req.user.id },
+      limit,
+      offset,
+    });
+
+    res.status(200).json({
+      totalPages,
+      currentPage: page,
+      nextPage: nextPage,
+      previousPage: previosPage,
+      hasNextpage,
+      hasPreviospage,
+      expenses: allExpenses,
+    });
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 exports.deleteExpense = async (req, res) => {

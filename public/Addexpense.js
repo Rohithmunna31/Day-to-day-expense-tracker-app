@@ -1,10 +1,5 @@
 const btn = document.getElementById("submit");
 
-const d = new Date().toLocaleString("en-us", {
-  timeStyle: "short",
-  dateStyle: "full",
-});
-
 btn.addEventListener("click", (e) => {
   e.preventDefault();
 
@@ -29,7 +24,7 @@ btn.addEventListener("click", (e) => {
       console.log(res);
       const { id, createdAt } = res.data;
 
-      const expenseList = document.getElementById("expenses-list");
+      // const expenseList = document.getElementById("expenses-list");
       const expenseTable = document.getElementById("expensestable");
 
       const row = document.createElement("tr");
@@ -61,6 +56,7 @@ btn.addEventListener("click", (e) => {
 
       expenseTable.appendChild(row);
     })
+
     .catch((err) => {
       console.log(err);
     });
@@ -71,82 +67,23 @@ window.addEventListener("load", async (e) => {
     const token = localStorage.getItem("token");
     const decodetoken = parseJwt(token);
     const ispremium = decodetoken.ispremiumuser;
-    const response = await axios.get("/expense/getexpenses", {
+
+    let page = 1;
+    const response = await axios.get(`/expense/getexpenses?page=${page}`, {
       headers: { Authorization: token },
     });
-    console.log(response);
-    const expenses = response.data;
-
     if (ispremium) {
-      premiumusersexpenses(expenses);
-      showpremiummessage();
-      return;
+      premiumusersexpenses(response.data.expenses);
+      paginationButtons(response.data);
+    } else {
+      showExpenses(response.data.expenses);
+      paginationButtons(response.data);
     }
-
-    const expensesBody = document.getElementById("expenses-list");
-
-    const expenseHeading = document.createElement("p");
-    expenseHeading.innerHTML = ` <h1 style="color":"red"> Day to Day expense Tracker </h1>`;
-    expensesBody.appendChild(expenseHeading);
-
-    const expensesTable = document.createElement("table");
-    expensesTable.setAttribute("id", "expensestable");
-
-    const headingsRow = document.createElement("tr");
-    const headings = [
-      "Created At",
-      "Expense",
-      "Description",
-      "Category",
-      "Actions",
-    ];
-    headings.forEach((headingText) => {
-      const headingCell = document.createElement("th");
-      headingCell.textContent = headingText;
-      headingsRow.appendChild(headingCell);
-    });
-    expensesTable.appendChild(headingsRow);
-
-    console.log();
-    expenses.forEach((expense) => {
-      const row = document.createElement("tr");
-      row.setAttribute("id", `data-${expense.id}`);
-
-      const dateCell = document.createElement("td");
-      dateCell.textContent = expense.createdAt
-        .toLocaleString()
-        .substring(0, 10);
-
-      const expenseCell = document.createElement("td");
-      expenseCell.textContent = expense.expense;
-
-      const descriptionCell = document.createElement("td");
-      descriptionCell.textContent = expense.description;
-
-      const categoryCell = document.createElement("td");
-      categoryCell.textContent = expense.category;
-
-      const deleteCell = document.createElement("td");
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete Expense";
-      deleteButton.addEventListener("click", () => deleteExpense(expense.id));
-      deleteCell.appendChild(deleteButton);
-
-      row.appendChild(dateCell);
-      row.appendChild(expenseCell);
-      row.appendChild(descriptionCell);
-      row.appendChild(categoryCell);
-      row.appendChild(deleteCell);
-
-      expensesTable.appendChild(row);
-    });
-    expensesBody.appendChild(expensesTable);
   } catch (error) {
     console.error("Error fetching expenses:", error);
   }
 });
 
-// Function to delete an expense
 async function deleteExpense(expenseId) {
   try {
     const expenseElement = document.querySelector(
@@ -225,8 +162,6 @@ function parseJwt(token) {
   return JSON.parse(jsonPayload);
 }
 
-function showpremiummessage() {}
-
 document.getElementById("leaderboard").addEventListener("click", async (e) => {
   try {
     const token = localStorage.getItem("token");
@@ -265,6 +200,9 @@ document.getElementById("leaderboard").addEventListener("click", async (e) => {
 });
 
 function premiumusersexpenses(expenses) {
+  const expensesBody = document.getElementById("expenses-list");
+  console.log("are you here");
+  expensesBody.innerHTML = "";
   document.getElementById("premium").style.visibility = "hidden";
 
   const youarepremium = document.getElementById("youarepremium");
@@ -285,10 +223,8 @@ function premiumusersexpenses(expenses) {
     );
   });
   console.log(thisyearExpenses);
-  const month = new Date().getMonth();
+  // const month = new Date().getMonth();
   const monthName = new Date().toLocaleString("en-us", { month: "long" });
-
-  const expensesBody = document.getElementById("expenses-list");
 
   const expenseHeading = document.createElement("p");
   expenseHeading.innerHTML = ` <h1 style="color":"red"> Day to Day expense Tracker </h1>`;
@@ -376,7 +312,6 @@ function premiumusersexpenses(expenses) {
 function download() {
   const token = localStorage.getItem("token");
 
-  console.log("Hello front end");
   axios
     .get("/expense/download", {
       headers: { Authorization: token },
@@ -394,4 +329,158 @@ function download() {
     .catch((err) => {
       console.log(err);
     });
+}
+
+function showExpenses(expenses) {
+  try {
+    const expensesBody = document.getElementById("expenses-list");
+
+    expensesBody.innerHTML = "";
+    const expenseHeading = document.createElement("p");
+    expenseHeading.innerHTML = ` <h1 style="color":"red"> Day to Day expense Tracker </h1>`;
+    expensesBody.appendChild(expenseHeading);
+
+    const expensesTable = document.createElement("table");
+    expensesTable.setAttribute("id", "expensestable");
+
+    const headingsRow = document.createElement("tr");
+    const headings = [
+      "Created At",
+      "Expense",
+      "Description",
+      "Category",
+      "Actions",
+    ];
+    headings.forEach((headingText) => {
+      const headingCell = document.createElement("th");
+      headingCell.textContent = headingText;
+      headingsRow.appendChild(headingCell);
+    });
+    expensesTable.appendChild(headingsRow);
+
+    console.log();
+    expenses.forEach((expense) => {
+      const row = document.createElement("tr");
+      row.setAttribute("id", `data-${expense.id}`);
+
+      const dateCell = document.createElement("td");
+      dateCell.textContent = expense.createdAt
+        .toLocaleString()
+        .substring(0, 10);
+
+      const expenseCell = document.createElement("td");
+      expenseCell.textContent = expense.expense;
+
+      const descriptionCell = document.createElement("td");
+      descriptionCell.textContent = expense.description;
+
+      const categoryCell = document.createElement("td");
+      categoryCell.textContent = expense.category;
+
+      const deleteCell = document.createElement("td");
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete Expense";
+      deleteButton.addEventListener("click", () => deleteExpense(expense.id));
+      deleteCell.appendChild(deleteButton);
+
+      row.appendChild(dateCell);
+      row.appendChild(expenseCell);
+      row.appendChild(descriptionCell);
+      row.appendChild(categoryCell);
+      row.appendChild(deleteCell);
+
+      expensesTable.appendChild(row);
+    });
+    expensesBody.appendChild(expensesTable);
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+  }
+}
+
+function getExpenses(page, token) {
+  axios
+    .get(`/expense/getexpenses?page=${page}`, {
+      headers: { Authorization: token },
+    })
+    .then((response) => {
+      showExpenses(response.data.expenses);
+      paginationButtons(response.data);
+    })
+    .catch((err) => {
+      return err;
+    });
+}
+
+function getpremiumuserexpenses(page, token) {
+  axios
+    .get(`/expense/getexpenses?page=${page}`, {
+      headers: { Authorization: token },
+    })
+    .then((response) => {
+      console.log("hello");
+      console.log("These are responses", response.data.expenses);
+      premiumusersexpenses(response.data.expenses);
+      paginationButtons(response.data);
+    })
+    .catch((err) => {
+      return err;
+    });
+}
+
+function paginationButtons(data) {
+  console.log(data);
+  const token = localStorage.getItem("token");
+  const decodetoken = parseJwt(token);
+  const ispremium = decodetoken.ispremiumuser;
+  const paginationbutton = document.getElementById("paginatingbuttons");
+  paginationbutton.innerHTML = "";
+  const currentPage = data.currentPage;
+  const previousPage = data.previousPage;
+  const nextPage = data.nextPage;
+  const hasNextpage = data.hasNextpage;
+  const hasPreviouspage = data.hasPreviospage;
+
+  if (hasPreviouspage) {
+    const previousPageButton = document.createElement("button");
+    previousPageButton.innerText = previousPage;
+    paginationbutton.appendChild(previousPageButton);
+    console.log("previous page", previousPage);
+    if (ispremium) {
+      previousPageButton.addEventListener("click", (e) => {
+        getpremiumuserexpenses(previousPage, token);
+      });
+    } else {
+      previousPageButton.addEventListener("click", (e) => {
+        getExpenses(previousPage, token);
+      });
+    }
+  }
+
+  const currentPageButton = document.createElement("button");
+  currentPageButton.innerText = currentPage;
+  paginationbutton.appendChild(currentPageButton);
+  if (ispremium) {
+    currentPageButton.addEventListener("click", (e) => {
+      getpremiumuserexpenses(currentPage, token);
+    });
+  } else {
+    currentPageButton.addEventListener("click", (e) => {
+      getExpenses(currentPage, token);
+    });
+  }
+
+  if (hasNextpage) {
+    const nextPageButton = document.createElement("button");
+    nextPageButton.innerText = nextPage;
+    paginationbutton.appendChild(nextPageButton);
+    if (ispremium) {
+      nextPageButton.addEventListener("click", (e) => {
+        getpremiumuserexpenses(nextPage, token);
+      });
+    } else {
+      nextPageButton.addEventListener("click", (e) => {
+        getExpenses(nextPage, token);
+      });
+    }
+  }
 }
