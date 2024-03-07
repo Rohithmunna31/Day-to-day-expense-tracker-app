@@ -1,3 +1,6 @@
+const dateElement = document.getElementById("datenow");
+dateElement.innerText = new Date().toLocaleString();
+
 const btn = document.getElementById("submit");
 
 btn.addEventListener("click", (e) => {
@@ -64,16 +67,21 @@ btn.addEventListener("click", (e) => {
 
 window.addEventListener("load", async (e) => {
   try {
+    const limit = localStorage.getItem("limit");
     const token = localStorage.getItem("token");
     const decodetoken = parseJwt(token);
     const ispremium = decodetoken.ispremiumuser;
 
     let page = 1;
-    const response = await axios.get(`/expense/getexpenses?page=${page}`, {
-      headers: { Authorization: token },
-    });
+    const response = await axios.get(
+      `/expense/getexpenses?page=${page}&limit=${limit}`,
+      {
+        headers: { Authorization: token },
+      }
+    );
     if (ispremium) {
       premiumusersexpenses(response.data.expenses);
+      console.log("premium users expenses");
       paginationButtons(response.data);
     } else {
       showExpenses(response.data.expenses);
@@ -211,6 +219,7 @@ function premiumusersexpenses(expenses) {
   const leaderboard = document.getElementById("leaderboard");
   leaderboard.style.visibility = "visible";
   leaderboard.innerText = "Show Leaderboard";
+  console.log(expenses);
   const thisyearExpenses = expenses.filter((expense) => {
     return (
       expense.createdAt.substring(0, 4) == new Date().getFullYear().toString()
@@ -398,8 +407,9 @@ function showExpenses(expenses) {
 }
 
 function getExpenses(page, token) {
+  const limit = localStorage.getItem("limit") || 10;
   axios
-    .get(`/expense/getexpenses?page=${page}`, {
+    .get(`/expense/getexpenses?page=${page} &limit=${limit}`, {
       headers: { Authorization: token },
     })
     .then((response) => {
@@ -412,12 +422,12 @@ function getExpenses(page, token) {
 }
 
 function getpremiumuserexpenses(page, token) {
+  const limit = localStorage.getItem("limit") || 10;
   axios
-    .get(`/expense/getexpenses?page=${page}`, {
+    .get(`/expense/getexpenses?page=${page}&limit=${limit}`, {
       headers: { Authorization: token },
     })
     .then((response) => {
-      console.log("hello");
       console.log("These are responses", response.data.expenses);
       premiumusersexpenses(response.data.expenses);
       paginationButtons(response.data);
@@ -483,4 +493,15 @@ function paginationButtons(data) {
       });
     }
   }
+  var limit = 0;
+  document.getElementById("select").addEventListener("click", (e) => {
+    limit = document.getElementById("select").value;
+    localStorage.setItem("limit", limit);
+
+    if (ispremium) {
+      getpremiumuserexpenses(currentPage, token);
+    } else {
+      getExpenses(currentPage, token);
+    }
+  });
 }

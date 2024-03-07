@@ -46,6 +46,8 @@ th {
 #paginatingbuttons button {
   background-color: grey;
 }
-#date {
-  font-weight: bold;
+#datenow {
+  position: fixed;
+  top: 0;
+  right: 0;
 }

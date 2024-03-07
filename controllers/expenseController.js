@@ -62,8 +62,10 @@ exports.postAddexpense = async (req, res) => {
 
 exports.getExpenses = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; // Extract page number from query parameter, default to page 1 if not provided
-    const limit = 10; // Number of expenses per page
+    const page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
+    console.log(req.query);
+    const limit =
+      parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 10;
 
     const offset = (page - 1) * limit;
 
