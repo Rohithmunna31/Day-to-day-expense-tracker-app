@@ -6,14 +6,12 @@ try {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    console.log(email, password);
     axios
       .post("/user/login", {
         email: email,
         password: password,
       })
       .then((res) => {
-        console.log(res);
         alert("Logged in successfully");
         localStorage.setItem("token", res.data.token);
         window.location.href = "/expense/addexpense";
@@ -22,13 +20,11 @@ try {
         const displayerror = document.getElementById("displayerror");
         displayerror.innerHTML += `${err}`;
         displayerror.innerHTML += "Invalid details";
-        console.log(err);
       });
   });
 } catch (err) {
   const displayerror = document.getElementById("displayerror");
   displayerror.innerHTML += `${err}`;
-  console.log(err);
 }
 
 const newusersignup = document.getElementById("newusersignup");

@@ -19,7 +19,6 @@ exports.getForgotpassword = (req, res) => {
 exports.postForgotpassword = async (req, res) => {
   try {
     const id = uuid.v4();
-    console.log(id);
     const { email } = req.body;
     let apiInstance = new brevo.TransactionalEmailsApi();
 
@@ -35,7 +34,6 @@ exports.postForgotpassword = async (req, res) => {
         .status(400)
         .send({ message: "Cannot find user with this email id" });
     }
-    console.log(user);
     const userId = user.dataValues.id;
 
     await forgotpassword.create({
@@ -52,10 +50,8 @@ exports.postForgotpassword = async (req, res) => {
     sendSmtpEmail.to = [{ email: email, name: "Reciever" }];
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    // console.log(data);
     res.status(200).send(data);
   } catch (err) {
-    console.log(err);
     return res.status(400).json({ message: err, sucess: false });
   }
 };

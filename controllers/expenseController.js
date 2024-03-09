@@ -10,7 +10,6 @@ const path = require("path");
 
 const sequelize = require("../utill/database");
 
-const { log } = require("console");
 
 exports.getAddexpense = (req, res) => {
   res.sendFile(path.join(__dirname, "../public/Addexpense.html"));
@@ -39,9 +38,7 @@ exports.postAddexpense = async (req, res) => {
       }
     );
     values = data.dataValues;
-    console.log(values);
     const total_expense = Number(req.user.total_cost) + Number(expense);
-    console.log(total_expense);
     await User.update(
       {
         total_cost: total_expense,
@@ -54,7 +51,6 @@ exports.postAddexpense = async (req, res) => {
     await t.commit();
     res.status(200).send(values);
   } catch (err) {
-    console.log(err);
     await t.rollback();
     return res.send("an error occurder cannot create expense");
   }
@@ -63,7 +59,6 @@ exports.postAddexpense = async (req, res) => {
 exports.getExpenses = async (req, res) => {
   try {
     const page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
-    console.log(req.query);
     const limit =
       parseInt(req.query.limit) > 0 ? parseInt(req.query.limit) : 10;
 
@@ -96,7 +91,6 @@ exports.getExpenses = async (req, res) => {
       expenses: allExpenses,
     });
   } catch (error) {
-    console.error("Error fetching expenses:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -108,7 +102,6 @@ exports.deleteExpense = async (req, res) => {
 
   try {
     const total_cost = req.user.total_cost;
-    console.log(id);
     const expensetodelete = await expenses.findOne({ where: { id } });
     const updatedtotal_cost = total_cost - expensetodelete.dataValues.expense;
 
@@ -129,7 +122,6 @@ exports.deleteExpense = async (req, res) => {
     res.status(200).send("deleted successfully");
   } catch (err) {
     t.rollback();
-    console.log(err);
     res.status(500).send("an error occured cannot delete expense");
   }
 };
@@ -137,8 +129,6 @@ exports.deleteExpense = async (req, res) => {
 exports.downloadexpense = async (req, res) => {
   try {
     const expense = await expenses.findAll({ where: { UserId: req.user.id } });
-
-    console.log(expense);
 
     const stringifiedexpense = JSON.stringify(expense);
 
@@ -152,7 +142,6 @@ exports.downloadexpense = async (req, res) => {
 
     res.status(201).json({ fileUrl, status: "success", err: null });
   } catch (err) {
-    console.log(err);
     res.status(401).json({ fileUrl: null, success: "failed", err });
   }
 };
@@ -161,7 +150,6 @@ function uploadtos3(data, filename) {
   const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
   const USER_KEY = process.env.AWS_IAM_USER_KEY;
   const USER_SECRET = process.env.AWS_IAM_USER_SECRET;
-  console.log(BUCKET_NAME);
 
   let s3 = new AWS.S3({
     accessKeyId: USER_KEY,
@@ -179,7 +167,6 @@ function uploadtos3(data, filename) {
       {},
       (err, response) => {
         if (err) {
-          console.log(err);
           reject(err);
         } else {
           resolve(response.Location);

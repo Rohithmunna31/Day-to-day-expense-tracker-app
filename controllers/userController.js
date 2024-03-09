@@ -15,65 +15,63 @@ exports.getUserlogin = (req, res) => {
 };
 
 exports.postUsersignup = async (req, res) => {
-  console.log(req.body);
+  try {
+    const { username, email, password } = req.body;
 
-  const { username, email, password } = req.body;
-
-  const find = await Data.findOne({
-    where: {
-      email: email,
-    },
-  });
-
-  if (find) {
-    console.log("email already exists try logging in");
-    return res.status(400).json({ err: "email already exists try logging in" });
-  } else {
-    console.log("uploading user data");
-    bcrypt.hash(password, 10, async (err, hash) => {
-      console.log(err);
-      console.log("iam here in creation");
-      await Data.create({
-        username: username,
+    const find = await Data.findOne({
+      where: {
         email: email,
-        password: hash,
-      });
-      res.send({ msg: "user created" });
+      },
     });
+
+    if (find) {
+      return res
+        .status(400)
+        .json({ err: "email already exists try logging in" });
+    } else {
+      bcrypt.hash(password, 10, async (err, hash) => {
+        await Data.create({
+          username: username,
+          email: email,
+          password: hash,
+        });
+        res.send({ success: true, msg: "user created" });
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ success: false, message: "an error occured" });
   }
 };
 
 exports.postUserlogin = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
+    const newData = await Data.findOne({ where: { email: email } });
 
-  const newData = await Data.findOne({ where: { email: email } });
-
-  // console.log(newData.dataValues);
-
-  if (newData) {
-    bcrypt.compare(password, newData.dataValues.password, (err, data) => {
-      if (err) {
-        console.log("err occrued didnt compare");
-        res.send("err occured didnt compare password");
-      }
-      if (data === true) {
-        console.log("password matched successfully");
-        res.status(200).json({
-          message: "password matched succesfully",
-          token: generateAccessToken(
-            newData.dataValues.id,
-            newData.dataValues.username,
-            newData.dataValues.ispremiumuser
-          ),
-        });
-      } else {
-        console.log("Wrong password");
-        res.status(401).send("wrong password");
-      }
-    });
-  } else {
-    console.log("email not found ");
-    res.status(404).send("email not found");
+    if (newData) {
+      bcrypt.compare(password, newData.dataValues.password, (err, data) => {
+        if (err) {
+      
+          res.send("err occured didnt compare password");
+        }
+        if (data === true) {
+          res.status(200).json({
+            message: "password matched succesfully",
+            token: generateAccessToken(
+              newData.dataValues.id,
+              newData.dataValues.username,
+              newData.dataValues.ispremiumuser
+            ),
+          });
+        } else {
+          res.status(401).send("wrong password");
+        }
+      });
+    } else {
+      res.status(404).send("email not found");
+    }
+  } catch (err) {
+    res.status(400).json({success:false,message:"an error occured"});
   }
 };
 

@@ -9,11 +9,9 @@ document.getElementById("confirm").addEventListener("click", (e) => {
       .post("/password/resetpassword", { newPassword: password, id })
       .then((res) => {
         document.body.innerHTML += `<div style="color:blue;"> Password changed successfully try log in <div>`;
-        console.log(res);
       })
       .catch((err) => {
         document.body.innerHTML += `<div style="color:red;"> ${err} <div>`;
-        console.log(err);
       });
   } else {
     document.body.innerHTML += `<div style="color:red;"> Password and Confirm password does'nt match try again  <div>`;

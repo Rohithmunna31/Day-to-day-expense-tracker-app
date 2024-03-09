@@ -24,10 +24,7 @@ btn.addEventListener("click", (e) => {
       }
     )
     .then((res) => {
-      console.log(res);
       const { id, createdAt } = res.data;
-
-      // const expenseList = document.getElementById("expenses-list");
       const expenseTable = document.getElementById("expensestable");
 
       const row = document.createElement("tr");
@@ -61,7 +58,10 @@ btn.addEventListener("click", (e) => {
     })
 
     .catch((err) => {
-      console.log(err);
+      const displayerror = document.getElementById("displayerror");
+      displayerror.innerHTML = "";
+      displayerror += "cant add expense";
+      displayerror.style.color = "red";
     });
 });
 
@@ -81,14 +81,16 @@ window.addEventListener("load", async (e) => {
     );
     if (ispremium) {
       premiumusersexpenses(response.data.expenses);
-      console.log("premium users expenses");
       paginationButtons(response.data);
     } else {
       showExpenses(response.data.expenses);
       paginationButtons(response.data);
     }
   } catch (error) {
-    console.error("Error fetching expenses:", error);
+    const displayerror = document.getElementById("displayerror");
+    displayerror.innerHTML = "";
+    displayerror += "error loading expense";
+    displayerror.style.color = "red";
   }
 });
 
@@ -97,7 +99,6 @@ async function deleteExpense(expenseId) {
     const expenseElement = document.querySelector(
       `#expenses-list [id=data-${expenseId}]`
     );
-    // console.log(expenseElement);
     if (expenseElement) {
       expenseElement.remove();
     }
@@ -106,24 +107,24 @@ async function deleteExpense(expenseId) {
       headers: { Authorization: token },
     });
   } catch (error) {
-    console.log("Error deleting expense:", error);
+    const displayerror = document.getElementById("displayerror");
+    displayerror.innerHTML = "";
+    displayerror += "error deleting expense";
+    displayerror.style.color = "red";
   }
 }
 
 document.getElementById("premium").addEventListener("click", async (e) => {
-  const token = localStorage.getItem("token");
-  console.log(token);
-
-  const response = await axios.get("/purchase/buypremiummembership", {
-    headers: { Authorization: token },
-  });
-  console.log(response);
-  console.log("iam here at premium membership");
   try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get("/purchase/buypremiummembership", {
+      headers: { Authorization: token },
+    });
     let options = {
       key: response.data.key_id,
       order_id: response.data.order.id,
-      // This function will handle the success of payment
+
       handler: async function (response) {
         const res = await axios.post(
           "/purchase/updatetransactionstatus",
@@ -137,8 +138,7 @@ document.getElementById("premium").addEventListener("click", async (e) => {
         );
 
         alert("You are premium member now ");
-        // localStorage.setItem("token", res.data.token);
-        showpremiummessage();
+        getpremiumuserexpenses(1, token);
       },
     };
     const rzp1 = new Razorpay(options);
@@ -146,11 +146,13 @@ document.getElementById("premium").addEventListener("click", async (e) => {
     e.preventDefault();
 
     rzp1.on("payment.failed", function (response) {
-      console.log(response);
       alert("something went wrong");
     });
   } catch (err) {
-    console.log(err);
+    const displayerror = document.getElementById("displayerror");
+    displayerror.innerHTML = "";
+    displayerror += "error deleting expense";
+    displayerror.style.color = "red";
   }
 });
 
@@ -177,8 +179,6 @@ document.getElementById("leaderboard").addEventListener("click", async (e) => {
       headers: { Authorization: token },
     });
 
-    console.log(leaderboardArray);
-
     const leaderboardTable = document.createElement("table");
     leaderboardTable.innerHTML = "<h1>Leaderboard</h1>";
 
@@ -203,13 +203,15 @@ document.getElementById("leaderboard").addEventListener("click", async (e) => {
 
     leaderboardelements.appendChild(leaderboardTable);
   } catch (error) {
-    console.error("Error fetching leaderboard:", error);
+    const displayerror = document.getElementById("displayerror");
+    displayerror.innerHTML = "";
+    displayerror += "An error occured";
+    displayerror.style.color = "red";
   }
 });
 
 function premiumusersexpenses(expenses) {
   const expensesBody = document.getElementById("expenses-list");
-  console.log("are you here");
   expensesBody.innerHTML = "";
   document.getElementById("premium").style.visibility = "hidden";
 
@@ -219,7 +221,6 @@ function premiumusersexpenses(expenses) {
   const leaderboard = document.getElementById("leaderboard");
   leaderboard.style.visibility = "visible";
   leaderboard.innerText = "Show Leaderboard";
-  console.log(expenses);
   const thisyearExpenses = expenses.filter((expense) => {
     return (
       expense.createdAt.substring(0, 4) == new Date().getFullYear().toString()
@@ -231,8 +232,7 @@ function premiumusersexpenses(expenses) {
       parseInt(expense.createdAt.substring(5, 7)) - 1 == new Date().getMonth()
     );
   });
-  console.log(thisyearExpenses);
-  // const month = new Date().getMonth();
+
   const monthName = new Date().toLocaleString("en-us", { month: "long" });
 
   const expenseHeading = document.createElement("p");
@@ -261,7 +261,6 @@ function premiumusersexpenses(expenses) {
   });
   expensesTable.appendChild(headingsRow);
 
-  console.log(thismonthExpenses);
   thismonthExpenses.forEach((expense) => {
     const row = document.createElement("tr");
     row.setAttribute("id", `data-${expense.id}`);
@@ -296,11 +295,8 @@ function premiumusersexpenses(expenses) {
 
   let totalyearExpense = 0;
   thisyearExpenses.forEach((expense) => {
-    console.log(expense.expense);
     totalyearExpense += expense.expense;
   });
-
-  console.log(totalyearExpense);
 
   const totalYearExpensesTable = document.createElement("table");
   const totalYearHeadingRow = document.createElement("tr");
@@ -327,16 +323,16 @@ function download() {
     })
     .then((response) => {
       var a = document.createElement("a");
-      console.log(response);
-      console.log(response.data);
       a.href = response.data.fileUrl;
       a.download = "myexpense.csv";
       a.click();
-      console.log("success");
       return;
     })
     .catch((err) => {
-      console.log(err);
+      const displayerror = document.getElementById("displayerror");
+      displayerror.innerHTML = "";
+      displayerror += "error loading expense";
+      displayerror.style.color = "red";
     });
 }
 
@@ -367,7 +363,6 @@ function showExpenses(expenses) {
     });
     expensesTable.appendChild(headingsRow);
 
-    console.log();
     expenses.forEach((expense) => {
       const row = document.createElement("tr");
       row.setAttribute("id", `data-${expense.id}`);
@@ -402,7 +397,10 @@ function showExpenses(expenses) {
     });
     expensesBody.appendChild(expensesTable);
   } catch (error) {
-    console.error("Error fetching expenses:", error);
+    const displayerror = document.getElementById("displayerror");
+    displayerror.innerHTML = "";
+    displayerror += "error loading expense";
+    displayerror.style.color = "red";
   }
 }
 
@@ -428,7 +426,6 @@ function getpremiumuserexpenses(page, token) {
       headers: { Authorization: token },
     })
     .then((response) => {
-      console.log("These are responses", response.data.expenses);
       premiumusersexpenses(response.data.expenses);
       paginationButtons(response.data);
     })
@@ -438,7 +435,6 @@ function getpremiumuserexpenses(page, token) {
 }
 
 function paginationButtons(data) {
-  console.log(data);
   const token = localStorage.getItem("token");
   const decodetoken = parseJwt(token);
   const ispremium = decodetoken.ispremiumuser;
@@ -454,7 +450,6 @@ function paginationButtons(data) {
     const previousPageButton = document.createElement("button");
     previousPageButton.innerText = previousPage;
     paginationbutton.appendChild(previousPageButton);
-    console.log("previous page", previousPage);
     if (ispremium) {
       previousPageButton.addEventListener("click", (e) => {
         getpremiumuserexpenses(previousPage, token);

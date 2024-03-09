@@ -1,9 +1,15 @@
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize("nodeproject1", "root", "Rohith@3112", {
-  dialect: "mysql",
-  host: "localhost",
-});
+const mysqlKeywords = require("../nodemon");
+
+const sequelize = new Sequelize(
+  mysqlKeywords.mysql_databasename,
+  mysqlKeywords.mysql_username,
+  mysqlKeywords.mysql_password,
+  {
+    dialect: "mysql",
+    host: "localhost",
+  }
+);
 
 module.exports = sequelize;
-

@@ -1,10 +1,12 @@
 const express = require("express");
+const fs = require("fs");
 const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 const path = require("path");
 const app = express();
 const bodyparser = require("body-parser");
 const sequelize = require("./utill/database");
-const { log } = require("console");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const purchaseRoutes = require("./routes/purchase");
@@ -16,13 +18,19 @@ const savedFiles = require("./models/savedfiles");
 const premiumRoutes = require("./routes/premiumroutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 
+const accesslogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyparser.urlencoded({ extended: false }));
 
-// parse application/json
 app.use(bodyparser.json());
-
+require("dotenv").config();
 app.use(cors());
+// app.use(helmet());
+app.use(morgan("combined", { stream: accesslogStream }));
 
 app.use("/user", userRoutes);
 
@@ -49,12 +57,9 @@ savedFiles.belongsTo(User);
 sequelize
   .sync()
   .then((res) => {
-    // console.log(res);
-    console.log("Database connected");
-    console.log(process.env.AWS_BUCKET_NAME);
+    // console.log("hello");
   })
   .catch((err) => {
-    console.log(err);
-    console.log("Database connection failed");
+    // console.log("hell");
   });
-app.listen(3000);
+app.listen(process.env.PORT);
