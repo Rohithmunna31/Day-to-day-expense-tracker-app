@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
 
+const secretKeyfolder = require("../nodemon");
+
 exports.getUsersignup = (req, res) => {
   res.sendFile(path.join(__dirname, "../public/signup.html"));
 };
@@ -51,7 +53,6 @@ exports.postUserlogin = async (req, res) => {
     if (newData) {
       bcrypt.compare(password, newData.dataValues.password, (err, data) => {
         if (err) {
-      
           res.send("err occured didnt compare password");
         }
         if (data === true) {
@@ -71,13 +72,13 @@ exports.postUserlogin = async (req, res) => {
       res.status(404).send("email not found");
     }
   } catch (err) {
-    res.status(400).json({success:false,message:"an error occured"});
+    res.status(400).json({ success: false, message: "an error occured" });
   }
 };
 
 function generateAccessToken(id, name, ispremiumuser) {
   return jwt.sign(
     { userId: id, name: name, ispremiumuser: ispremiumuser },
-    "secretkey"
+    secretKeyfolder.secretkey
   );
 }
