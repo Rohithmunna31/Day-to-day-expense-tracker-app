@@ -57,9 +57,8 @@ savedFiles.belongsTo(User);
 sequelize
   .sync()
   .then((res) => {
-    // console.log("hello");
+    app.listen(process.env.PORT);
   })
   .catch((err) => {
-    // console.log("hell");
+    console.log("database connection failed");
   });
-app.listen(process.env.PORT);

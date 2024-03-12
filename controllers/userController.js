@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
 
-const secretKeyfolder = require("../nodemon");
+require("dotenv").config();
 
 exports.getUsersignup = (req, res) => {
   res.sendFile(path.join(__dirname, "../public/signup.html"));
@@ -79,6 +79,6 @@ exports.postUserlogin = async (req, res) => {
 function generateAccessToken(id, name, ispremiumuser) {
   return jwt.sign(
     { userId: id, name: name, ispremiumuser: ispremiumuser },
-    secretKeyfolder.secretkey
+    process.env.SECRET_KEY
   );
 }

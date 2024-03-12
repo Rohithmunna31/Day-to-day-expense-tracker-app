@@ -326,6 +326,7 @@ function download() {
       a.href = response.data.fileUrl;
       a.download = "myexpense.csv";
       a.click();
+      window.location.href = response.data.fileUrl;
       return;
     })
     .catch((err) => {

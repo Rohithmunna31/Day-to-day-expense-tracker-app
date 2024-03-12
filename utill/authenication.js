@@ -2,12 +2,12 @@ const User = require("../models/User");
 
 const jwt = require("jsonwebtoken");
 
-const secretKeyfolder = require("../nodemon");
+require("dotenv").config();
 
 exports.authenication = (req, res, next) => {
   const token = req.header("Authorization");
 
-  const user = jwt.verify(token, secretKeyfolder.secretkey);
+  const user = jwt.verify(token, process.env.SECRET_KEY);
   User.findByPk(user.userId)
     .then((user) => {
       req.user = user.dataValues;

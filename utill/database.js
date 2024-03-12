@@ -1,14 +1,14 @@
 const Sequelize = require("sequelize");
 
-const mysqlKeywords = require("../nodemon");
+require("dotenv").config();
 
 const sequelize = new Sequelize(
-  mysqlKeywords.mysql_databasename,
-  mysqlKeywords.mysql_username,
-  mysqlKeywords.mysql_password,
+  process.env.MYSQL_DB,
+  process.env.MYSQL_USERNAME,
+  process.env.MYSQL_PASSWORD,
   {
     dialect: "mysql",
-    host: "localhost",
+    host: process.env.HOST,
   }
 );
 
