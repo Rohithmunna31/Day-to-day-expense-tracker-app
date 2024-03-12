@@ -29,7 +29,6 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 require("dotenv").config();
 app.use(cors());
-// app.use(helmet());
 app.use(morgan("combined", { stream: accesslogStream }));
 
 app.use("/user", userRoutes);
