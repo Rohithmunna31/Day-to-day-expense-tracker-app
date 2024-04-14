@@ -58,10 +58,11 @@ btn.addEventListener("click", (e) => {
     })
 
     .catch((err) => {
-      const displayerror = document.getElementById("displayerror");
-      displayerror.innerHTML = "";
-      displayerror += "cant add expense";
-      displayerror.style.color = "red";
+      // let displayerror = document.getElementById("displayerror") || null;
+      // displayerror.innerHTML = "";
+      // displayerror += "cant add expense";
+      // displayerror.style.color = "red";
+      console.log(err);
     });
 });
 
@@ -87,7 +88,7 @@ window.addEventListener("load", async (e) => {
       paginationButtons(response.data);
     }
   } catch (error) {
-    const displayerror = document.getElementById("displayerror");
+    let displayerror = document.getElementById("displayerror");
     displayerror.innerHTML = "";
     displayerror += "error loading expense";
     displayerror.style.color = "red";

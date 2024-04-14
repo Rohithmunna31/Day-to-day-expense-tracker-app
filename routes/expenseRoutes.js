@@ -14,20 +14,28 @@ router.get("/addexpense", expenseController.getAddexpense);
 // expense/addexpense => POST
 router.post(
   "/addexpense",
-  userAuthenication.authenication,
+  userAuthenication.authentication,
   expenseController.postAddexpense
 );
 
 // expense/getexpenses => GET
 router.get(
   "/getexpenses",
-  userAuthenication.authenication,
+  userAuthenication.authentication,
   expenseController.getExpenses
 );
 
-router.get('/download',userAuthenication.authenication,expenseController.downloadexpense);
+router.get(
+  "/download",
+  userAuthenication.authentication,
+  expenseController.downloadexpense
+);
 
 // expense/delete/:id => DELETE
-router.delete("/delete/:id",userAuthenication.authenication ,expenseController.deleteExpense);
+router.delete(
+  "/delete/:id",
+  userAuthenication.authentication,
+  expenseController.deleteExpense
+);
 
 module.exports = router;

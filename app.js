@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const path = require("path");
 const app = express();
 const bodyparser = require("body-parser");
-const sequelize = require("./utill/database");
+const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const purchaseRoutes = require("./routes/purchase");
@@ -41,27 +41,47 @@ app.use("/premium", premiumRoutes);
 
 app.use("/password", passwordRoutes);
 
-app.use((req,res)=>{
-    res.sendFile(path.join(__dirname,`public/${req.url}`));
-})
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, `public/${req.url}`));
+});
 
-User.hasMany(Expense);
-Expense.belongsTo(User);
+// User.hasMany(Expense);
+// Expense.belongsTo(User);
 
-User.hasMany(Orders);
-Orders.belongsTo(User);
+// User.hasMany(Orders);
+// Orders.belongsTo(User);
 
-User.hasMany(forgotpassword);
-forgotpassword.belongsTo(User);
+// User.hasMany(forgotpassword);
+// forgotpassword.belongsTo(User);
 
-User.hasMany(savedFiles);
-savedFiles.belongsTo(User);
+// User.hasMany(savedFiles);
+// savedFiles.belongsTo(User);
 
-sequelize
-  .sync()
-  .then((res) => {
-    app.listen(process.env.PORT);
-  })
-  .catch((err) => {
-    console.log("database connection failed");
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const dbConnection = mongoose.connection;
+
+dbConnection.once("open", () => {
+  console.log("Connected to MongoDB successfully!");
+
+  // Start the server once the connection is established
+  app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
   });
+});
+
+dbConnection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
+
+// sequelize
+//   .sync()
+//   .then((res) => {
+//     app.listen(process.env.PORT);
+//   })
+//   .catch((err) => {
+//     console.log("database connection failed");
+//   });
